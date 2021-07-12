@@ -1,9 +1,10 @@
 var mario, bg, ground;
-var bgSprite;
+var bgSprite, box,box1;
+var boxGroup;
+var gameState = "onBox"
 
 function preload() {
   bg = loadImage ("img/lbl.jpg");
-  mario = createImg("img/mario.gif")
 
 }
 
@@ -12,40 +13,51 @@ function setup() {
   bgSprite = createSprite(500,250,1700,500)
   bgSprite.addImage(bg);
   bgSprite.scale = 2;
-  trex = createSprite(50,180,10,10);
-//  trex.addImage(mario);
-  mario.position(trex.x-25,trex.y-30)
+  mario = createSprite(50,180,10,10);
+  mario.shapeColor = "red";
+  box1 = createSprite(mario.x,mario.y+20,50,10);
+  boxGroup = new Group();
+  boxGroup.add (box1)
+  boxes();
 
-  mario.size(50,50)
 
   
-
-  /*
-  gameover = createSprite(70,85);
-  restart=createSprite(70,125);
- // gameover.addImage(gameoverImage);
-  //restart.addImage(restartImage);
-  gameover.scale = 0.6;
-  restart.scale = 0.6;
-  gameover.visible=false;
-  restart.visible=false;
-  //create Obstacle and Cloud Groups
-  obstaclesGroup = createGroup();
-  cloudsGroup = createGroup();
-  
-  
-  //trex.setCollider("circle",0,0,40);
-  
-  score = 0;
-  */
 }
 
 function draw() {
   background(180);
+  if (keyDown("space") && gameState == "onBox"){
+    jump();
 
-  drawSprites();
+  }
+  mario.velocityY+=0.1;
+
+mario.collide(boxGroup,stop);
+drawSprites();
+}
+function jump() {
+  mario.velocityX = 1.6;
+  mario.velocityY = -3.245358;
+  gameState = "fly"
 }
 
+function stop(){
+  mario.velocityX=0;
+  mario.velocityY=0;
+  gameState = "onBox"
+}
+
+function boxes() {
+  var y = 180;
+    for (var i = 150;i<850;i+=(random(130,150))){
+      box = createSprite(i,y+=(random(-20,20)),50,10);
+      box.shapeColor = "brown"
+      boxGroup.add(box)
+    }
+}
+
+
+/*
 function spawnObstacles(){
  if (frameCount % 60 === 0){
    var obstacle = createSprite(600,165,10,40);
@@ -77,6 +89,8 @@ function spawnObstacles(){
     obstaclesGroup.add(obstacle);
  }
 }
+*/
+
 
 function spawnClouds() {
   //write code here to spawn the clouds
@@ -91,8 +105,8 @@ function spawnClouds() {
     cloud.lifetime = 200;
     
     //adjust the depth
-    cloud.depth = trex.depth;
-    trex.depth = trex.depth + 1;
+    cloud.depth = mario.depth;
+    mario.depth = mario.depth + 1;
     
     //adding cloud to the group
    cloudsGroup.add(cloud);
